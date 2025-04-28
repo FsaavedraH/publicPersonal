@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalles del Empleado{% endblock %}
+
+{% block content %}
+    <h2 class="mb-3" style="color: #0D1B2A;">Detalles de {{ persona.nombre }} {{ persona.apellido }}</h2>
+    <p><strong>Cédula:</strong> {{ persona.cedula }}</p>
+    <p><strong>Asistencia:</strong> {{ persona.estado_asistencia }}</p>
+    <a href="{% url 'personal' %}" class="btn btn-secondary">Volver</a>
+{% endblock %}

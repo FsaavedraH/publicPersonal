@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Agregar Personal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="text-center" style="color: #0D1B2A;">Registrar nuevo colaborador</h2>
+        
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label class="form-label" for="nombre">Nombre</label>
+                <input type="text" name="nombre" id="nombre" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="apellido">Apellido</label>
+                <input type="text" name="apellido" id="apellido" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="cedula">Cédula</label>
+                <input type="text" name="cedula" id="cedula" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="fecha_nacimiento">Fecha de nacimiento</label>
+                <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control" required>
+            </div>
+
+
+            <button type="submit" class="btn btn-primary w-100">Guardar</button>
+            <a href="{% url 'personal' %}" class="btn btn-secondary w-100 mt-2">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+    <div class="text-center">
+        <h1 class="mt-5" style="color: #0D1B2A;">Bienvenido a la Gestión de Personal</h1>
+        <p class="lead">Administra fácilmente la información de tu equipo.</p>
+        <a href="{% url 'signin' %}" class="btn btn-primary">Iniciar sesión</a>
+        <a href="{% url 'signup' %}" class="btn btn-primary">Crear cuenta</a>
+
+    </div>
+{% endblock %}

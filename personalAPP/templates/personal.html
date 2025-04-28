@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Personal{% endblock %}
+
+{% block content %}
+
+<h3>Bienvenido, {{ request.user.get_full_name|default:request.user.username }}</h3>
+
+<!-- Resumen de asistencia -->
+<div class="alert alert-info mt-3">
+    <strong>Total Personal:</strong> {{ total }} |
+    <strong>Presentes:</strong> {{ presentes }} |
+    <strong>Ausentes:</strong> {{ ausentes }}
+</div>
+
+<!-- Botón normal solo para Agregar Personal -->
+<div class="mb-3 d-flex gap-2">
+    <a href="{% url 'crear_personal' %}" class="btn btn-primary">Agregar Personal</a>
+</div>
+
+<!-- Botón flotante a la derecha -->
+<a href="{% url 'generar_reporte_asistencia' %}" class="btn btn-success floating-button">
+    Generar Reporte
+</a>
+
+<!-- Buscador en tiempo real -->
+<div class="input-group mb-3">
+    <input type="text" id="buscador" class="form-control" placeholder="Buscar por nombre, apellido o cédula...">
+</div>
+
+<!-- Formulario para GUARDAR ASISTENCIA -->
+<form method="post" action="{% url 'guardar_asistencia' %}">
+    {% csrf_token %}
+
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Estado de Asistencia</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-personal">
+        {% for persona in personal %}
+            <tr>
+                <td>{{ persona.nombre }}</td>
+                <td>{{ persona.apellido }}</td>
+                <td>
+                    <select name="estado_asistencia_{{ persona.pk }}" class="form-select">
+                        {% for estado, nombre_estado in persona.ESTADOS_ASISTENCIA %}
+                            <option value="{{ estado }}" {% if persona.estado_asistencia == estado %}selected{% endif %}>
+                                {{ nombre_estado }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'detalle_personal' persona.pk %}" class="btn btn-success">Ver</a>
+                        <a href="{% url 'editar_personal' persona.pk %}" class="btn btn-primary">Editar</a>
+
+                        <!-- Botón de eliminación -->
+                        <form method="post" action="{% url 'eliminar_personal' persona.pk %}" onsubmit="return confirmarEliminacion();">
+                            {% csrf_token %}
+                            <button class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">No hay personal registrado.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Botones flotantes a la izquierda -->
+    <div class="floating-actions d-flex flex-row gap-2">
+        <button type="submit" class="btn btn-warning">Guardar Cambios</button>
+        <button type="button" class="btn btn-secondary" onclick="limpiarCampos()">Limpiar Campos</button>
+    </div>
+</form>
+
+<!-- Script para confirmar eliminación, limpiar campos y buscar en tiempo real -->
+<script>
+    function confirmarEliminacion() {
+        return confirm("¿Estás seguro de que deseas eliminar a esta persona?");
+    }
+
+    function limpiarCampos() {
+        document.querySelectorAll('select[name^="estado_asistencia_"]').forEach(select => {
+            select.value = "Presente";
+        });
+    }
+
+    // Búsqueda en tiempo real sin AJAX
+    document.addEventListener("DOMContentLoaded", function () {
+        const buscador = document.getElementById("buscador");
+        const filas = document.querySelectorAll("#tabla-personal tr");
+
+        buscador.addEventListener("keyup", function () {
+            const filtro = buscador.value.toLowerCase();
+
+            filas.forEach(fila => {
+                const texto = fila.textContent.toLowerCase();
+                fila.style.display = texto.includes(filtro) ? "" : "none";
+            });
+        });
+    });
+</script>
+
+<!-- Estilos para botones flotantes y espacio al fondo -->
+<style>
+    .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+    }
+
+    .floating-actions {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 999;
+        display: flex;
+        gap: 10px;
+    }
+
+    /* Espacio extra al final para que los botones no tapen el contenido */
+    body {
+        padding-bottom: 120px;
+    }
+</style>
+
+{% endblock %}
